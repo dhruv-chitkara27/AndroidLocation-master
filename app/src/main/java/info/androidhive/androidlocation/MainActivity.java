@@ -15,7 +15,9 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -54,6 +56,11 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
+    //Database Class object
+    DatabaseHelper myDb;
+
+    //Database Button
+    Button db_Button;
     @BindView(R.id.location_result)
     TextView txtLocationResult;
 
@@ -95,6 +102,17 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        myDb = new DatabaseHelper(getApplicationContext());
+
+        //TODO: Apply click listener on the button
+        db_Button = (Button)findViewById(R.id.dbButton);
+        db_Button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDataBase();
+            }
+        });
         ButterKnife.bind(this);
 
         // initialize the necessary libraries
@@ -102,6 +120,12 @@ public class MainActivity extends AppCompatActivity {
 
         // restore the values from saved instance state
         restoreValuesFromBundle(savedInstanceState);
+
+    }
+
+    public void showDataBase(){
+        Intent intent = new Intent(MainActivity.this, ListViewAct.class);
+        startActivity(intent);
     }
 
     private void init() {
@@ -171,6 +195,14 @@ public class MainActivity extends AppCompatActivity {
 
             // location last updated time
             txtUpdatedOn.setText("Last updated on: " + mLastUpdateTime);
+
+
+            if( myDb.insertData( "Lat: " + mCurrentLocation.getLatitude() + ", " +
+                    "Lng: " + mCurrentLocation.getLongitude(), mLastUpdateTime))
+                Toast.makeText(getApplicationContext(),"Insert Successful",Toast.LENGTH_SHORT).show();
+            else
+                Toast.makeText(getApplicationContext(),"Insert Unsuccessful",Toast.LENGTH_SHORT).show();
+
         }
 
         toggleButtons();
